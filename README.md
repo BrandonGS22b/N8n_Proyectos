@@ -5,6 +5,16 @@ El proyecto está diseñado para ser fácilmente desplegado mediante **Docker** 
 
 ---
 
+## 🧠 Flujos Documentados
+
+| Proyecto | Descripción | Documentación |
+|-----------|--------------|----------------|
+| 🧬 **Proyecto Pokémon** | Obtiene datos de Pokémon desde una API, actualiza Google Sheets y envía un correo con los resultados. | [Ver documentación](./docs/Proyecto_Pokemon.md) |
+| 💼 **Agente Empresa** | Automatiza la gestión de solicitudes empresariales y envío de reportes por correo. | [Ver documentación](./docs/Agente_Empresa.md) |
+
+---
+
+
 ## 🚀 Características principales
 
 ✅ Integración con **GitHub** para control de versiones.  
