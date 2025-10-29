@@ -1,0 +1,255 @@
+{
+  "name": "Agente/Empresa",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente que se encarga de gestionar el envío de correos electrónicos. Primero, consultas tu base de contactos en \"contactos\" y Usando la herramienta de \"enviar_correo\" siempre. Respeta el salto de línea tras el saludo del cuerpo.\n\nEnvía un correo a la persona solicitada por: {{ $json.message.text }}\n\nCada correo debe estar estructurado de la siguiente manera:\n\nAsunto: (Incluye un título breve y claro que resuma el propósito del correo).\nCuerpo: (Escribe el mensaje completo, asegurándote de seguir una estructura lógica con introducción, desarrollo y cierre).\nFirma: (Añade la firma proporcionada por el usuario, si aplica).\nReglas clave:\n\nSiempre redacta el correo directamente según la solicitud del usuario, sin necesidad de confirmación adicional.\nAdapta el tono y el contenido según las instrucciones específicas que reciba.\nEl correo debe ser claro, directo y cumplir el propósito indicado.\n\nEjemplo de estructura:\n\nAsunto: Solicitud de información sobre el proyecto X\nCuerpo:\nHola [Nombre],\nEspero que este mensaje te encuentre bien. Quería solicitar información adicional sobre el proyecto X, específicamente en relación con [detalle proporcionado].\nQuedo a la espera de tu respuesta. Gracias de antemano.\nSaludos,\n\nCorreo 1: Solicitud de Información\nAsunto: Solicitud de información sobre el servicio X\nCuerpo:\nHola [Nombre del Destinatario],\nEspero que este mensaje te encuentre bien. Estoy interesado en conocer más detalles sobre el servicio X, especialmente en lo relacionado con [tema específico]. Agradecería mucho si pudieras enviarme información adicional o concertar una llamada para resolver mis dudas.\nQuedo atento a tu respuesta.\nSaludos,\n\nCorreo 2: Confirmación de Reunión\nAsunto: Confirmación de reunión para el [Fecha]\nCuerpo:\nEstimado/a [Nombre del Destinatario],\nConfirmo nuestra reunión programada para el día [fecha] a las [hora]. Si necesitas algún cambio en la hora o en el lugar, no dudes en comunicármelo.\nGracias y quedo a tu disposición para cualquier consulta previa.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        -160
+      ],
+      "id": "499546f9-1c6a-4f9b-9585-3d41ba3ae1fe",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        112
+      ],
+      "id": "b1f59c48-12c6-4760-838c-49bdc0082a16",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "huLW9eIBkoGT1u1x",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        112
+      ],
+      "id": "1600ced1-62c8-4ce4-9c1d-7f7a75381f43",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -784,
+        -160
+      ],
+      "id": "8b8937ca-4cb3-4084-ba15-6668fbde0858",
+      "name": "Telegram Trigger",
+      "webhookId": "cde4222f-3db3-45a7-833c-88c7d2fb1e5f",
+      "credentials": {
+        "telegramApi": {
+          "id": "rRmeNP3Xv1WN1nCc",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Vl9uVWUtRnlGo6vjL6qiZrNcFNFgY37skRknOQXNhBw",
+          "mode": "list",
+          "cachedResultName": "Contacto de clientes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vl9uVWUtRnlGo6vjL6qiZrNcFNFgY37skRknOQXNhBw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vl9uVWUtRnlGo6vjL6qiZrNcFNFgY37skRknOQXNhBw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        128
+      ],
+      "id": "bdb460ba-e9ce-4bff-ae0b-ac41bc4e454d",
+      "name": "contactos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Iy1Fsbpa1Jio8Q4z",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"correo\") }}",
+        "subject": "={{ $fromAI(\"asunto\") }}",
+        "message": "={{ $fromAI(\"mensaje_correo\",\"aqui el cuerpo del correo con salto de linea tras el saludo\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        32
+      ],
+      "id": "8878147f-e6dd-4c65-827f-334d6e36b767",
+      "name": "Send a message in Gmail",
+      "webhookId": "8338411f-bb0c-4e30-9585-655934174520",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "38z8Q0JCGYihBJIW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1",
+        "text": "1",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "f9ed791f-95f9-4abf-bd7e-744859a07fa3",
+      "name": "Send a text message",
+      "webhookId": "c1229fe4-9121-4579-a5db-67943d78d3c8",
+      "credentials": {
+        "telegramApi": {
+          "id": "rRmeNP3Xv1WN1nCc",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "AI Agent": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contactos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "23677124-fe14-4597-ae20-a5d50a261e51",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edee4fdb0e6ddb09141983ae34a6a0bdc11efabbbd40bec9e217372c56e50596"
+  },
+  "id": "dCNjLguWMyhpEG5k",
+  "tags": []
+}
