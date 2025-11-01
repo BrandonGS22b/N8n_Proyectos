@@ -35,14 +35,6 @@ El flujo se ejecuta de forma manual o programada y realiza los siguientes pasos:
 
 ---
 
-## 🧠 Flujo Visual
-
-![Flujo Pokémon](../assets/flujo_pokemon.png)
-
-> 💡 *Puedes guardar esta imagen en la carpeta `/assets` o `/docs/img` para mantener la documentación organizada.*
-
----
-
 ## 🧾 Ejemplo de Configuración
 
 **Hoja de Google:**
