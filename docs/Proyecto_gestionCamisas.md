@@ -35,6 +35,11 @@ El flujo opera en un ciclo de **"leer, verificar y actualizar"** por cada solici
 7. 📊 El inventario y la hoja se mantienen siempre sincronizados.
 
 ---
+## 🧠 Flujo Visual
+
+![Flujo Pokémon](./img/Form-Ropa.png)
+
+---
 
 **Autor:** _Brandon Dulian Garcia Suarez_  
 **Plataforma:** n8n  
