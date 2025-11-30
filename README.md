@@ -12,7 +12,7 @@ El proyecto está diseñado para ser fácilmente desplegado mediante **Docker** 
 | 🧬 **Proyecto Pokémon** | Obtiene datos de Pokémon desde una API, actualiza Google Sheets y envía un correo con los resultados. | [Ver documentación](./docs/Proyecto_Pokemon.md) |
 | 💼 **Agente Empresa** | Automatiza la gestión de solicitudes empresariales y envío de reportes por correo. | [Ver documentación](./docs/Agente_Empresa.md) |
 | 👕 **Gestión de Solicitudes y Stock de T-Shirts (n8n)** | Flujo automatizado que procesa solicitudes de camisetas desde Google Sheets, verifica stock en PostgreSQL y actualiza el inventario y estado de las solicitudes. | [Ver documentación](./docs/Proyecto_gestionCamisas.md) |
-| 🧩 **Extracción y Actualización Automática de Cursos** | Flujo que analiza sitios web, extrae cursos usando IA, actualiza información, genera documentos y temarios automáticamente. | [Ver documentación](./docs/Scraping-curso.md) |
+| 🧩 **Extracción y Actualización Automática de Cursos (Scraping)** | Flujo que analiza sitios web, extrae cursos usando IA, actualiza información, genera documentos y temarios automáticamente. | [Ver documentación](./docs/Scraping-curso.md) |
 
 ---
 
