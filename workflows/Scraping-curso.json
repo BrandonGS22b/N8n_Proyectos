@@ -1,0 +1,973 @@
+{
+  "name": "Scraping-curso",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -256
+      ],
+      "id": "56c29757-7455-4153-8d73-ff8b94e1ebd1",
+      "name": "Obtener sitios a investigar"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -112
+      ],
+      "id": "7639ee7f-0ffb-4fc1-8454-29a33870f476",
+      "name": "Inicio manual de procesos"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw",
+          "mode": "list",
+          "cachedResultName": "Course Scraping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sitios Web a Buscar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -240,
+        -176
+      ],
+      "id": "d510f2c6-9568-4937-9679-dd53db5b38c8",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ADNqzW2MOUstkv2d",
+          "name": "Obtener pokemons"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2c3d7e8b-055a-4e49-994e-0eaf3c183941",
+              "leftValue": "={{ $json['Sitio Web'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "6580e621-694a-429f-a7e4-4bc659f9e517",
+              "leftValue": "={{ $json['Sitio Web'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "3560f47b-d38a-4690-8e46-b7c47d27bfa0",
+      "name": "Filtrar sitios Web con enlace"
+    },
+    {
+      "parameters": {
+        "content": "## Inicio de proceso\nTomar sitios web para buscar informacion en ellos\n",
+        "height": 112,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -544,
+        -368
+      ],
+      "typeVersion": 1,
+      "id": "17b9847d-2fc6-44a4-98d2-d946471afb5f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['Sitio Web'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        176,
+        -176
+      ],
+      "id": "02835532-46e1-4424-9d91-348f4cd0bd24",
+      "name": "Obtener Html del Sitio Web"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        384,
+        -176
+      ],
+      "id": "6f45c0d8-2c7d-4409-bc9e-54916e6c4522",
+      "name": "Transformar a Markdown"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Información\nEres un asistente para extraer datos de un sitio web, se te dará la información en formato Markdown, y necesito que retornes la información en el formato deseado.\n\nNo retornes nada más de lo que te necesito.\n\nSi el URL no está completo, completarlo usando el URL que también te proveeran del sitio del cual se extrae la información.\n\n## Objetivo\nInformación que necesitas extraer y encontrar: \n\n- Nombre del instructor (instructorName)\n- url del curso de Udemy (udemyUrl) (si lo tiene, si no null)\n- url del curso de DevTalles (devtallesUrl) \n- Nombre del curso (courseName)\n- Descripción del curso (description)\n- Categoría del curso (category)\n- Otra información relevante (additionalInformation)\n\n## Ejemplo de salida\nNecesito un json con la siguiente estructura:\n[\n{\n  courseName: 'XXX',\n  instructor: 'XXX',\n  devtallesUrl: 'https://xxx',\n  udemyUrl: 'https://xxx',\n  description: 'xxx',\n  category: 'xxx',\n  additionalInformation: 'xxxx' \n},\n{\n  courseName: 'XXX',\n  instructor: 'XXX',\n  devtallesUrl: 'https://xxx',\n  udemyUrl: 'https://xxx',\n  description: 'xxx',\n  category: 'xxx',\n  additionalInformation: 'xxxx' \n}\n]\n",
+              "role": "system"
+            },
+            {
+              "content": "=# URL del sitio\n{{ $('Get row(s) in sheet').item.json['Sitio Web'] }}\n\n# Data a extrar\n{{ $json.data }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        624,
+        -176
+      ],
+      "id": "6c99b7da-3f8a-460d-8507-987964fa1aee",
+      "name": "Enviar información a OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "huLW9eIBkoGT1u1x",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content.courses",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -176
+      ],
+      "id": "8bbfc345-e2b6-42cd-9212-f44d79d9e71f",
+      "name": "Extraer Arreglo de Cursos"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -192,
+        96
+      ],
+      "id": "0985c469-609d-4610-b0d1-353d38be264f",
+      "name": "barrer cada Curso"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Fin de lectura del curso",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        112
+      ],
+      "id": "62e586ad-df44-44c7-be78-a975be1699f3"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw",
+          "mode": "list",
+          "cachedResultName": "Course Scraping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1257210442,
+          "mode": "list",
+          "cachedResultName": "Resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit#gid=1257210442"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre del Curso": "={{ $json.courseName }}",
+            "Instructor": "={{ $json.instructorName }}",
+            "DevTalles": "={{ $json.devtallesUrl }}",
+            "Udemy": "={{ $json.udemyUrl }}",
+            "Descripccion": "={{ $json.description }}",
+            "Google Docs-Temario": ""
+          },
+          "matchingColumns": [
+            "Nombre del Curso"
+          ],
+          "schema": [
+            {
+              "id": "Nombre del Curso",
+              "displayName": "Nombre del Curso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instructor",
+              "displayName": "Instructor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DevTalles",
+              "displayName": "DevTalles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Udemy",
+              "displayName": "Udemy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripccion",
+              "displayName": "Descripccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Docs-Temario",
+              "displayName": "Google Docs-Temario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        112
+      ],
+      "id": "ceb16d2a-269f-409a-8a03-8be5b973d888",
+      "name": "Actualizar informacion General del Curso",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ADNqzW2MOUstkv2d",
+          "name": "Obtener pokemons"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://fernando-herrera.com/courses",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        400
+      ],
+      "id": "c05cbd0f-01bf-4bae-8f33-0936877a66cb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "scrape",
+        "url": "={{ $json.Udemy }}",
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        336,
+        112
+      ],
+      "id": "9b024bd1-fca2-48f3-96a7-fd699bf719d1",
+      "name": "Scrape Informacion de Udemy",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "SP8fUnWtQghwA6o9",
+          "name": "Firecrawl account-github"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "10P6GrQX6WvmKaht5fbK2p8N2ieIxwTuQ",
+        "title": "={{ $json.data.metadata.title.replaceAll(':','') }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        608,
+        112
+      ],
+      "id": "360790f8-f6e5-4c84-b954-13a2c2117fe1",
+      "name": "Crear documento del curso",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "vAseSMT92VWjwbca",
+          "name": "Google Docs account-brandon36cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('Crear documento del curso').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Scrape Informacion de Udemy').item.json.data.markdown }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        112
+      ],
+      "id": "0691bc41-03de-4e2e-ad85-4495efb9361b",
+      "name": "Actualizar temario dentro del documento en docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "vAseSMT92VWjwbca",
+          "name": "Google Docs account-brandon36cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw",
+          "mode": "list",
+          "cachedResultName": "Course Scraping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1257210442,
+          "mode": "list",
+          "cachedResultName": "Resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMSp96gEloiQij4ZPEYLxAwponqyWpZGL_6vSPfgRAw/edit#gid=1257210442"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre del Curso": "={{ $('Actualizar informacion General del Curso').item.json['Nombre del Curso'] }}",
+            "Instructor": "={{ $('Actualizar informacion General del Curso').item.json.Instructor }}",
+            "DevTalles": "={{ $('Actualizar informacion General del Curso').item.json.DevTalles }}",
+            "Descripccion": "={{ $('Actualizar informacion General del Curso').item.json.Descripccion }}",
+            "Udemy": "={{ $('Actualizar informacion General del Curso').item.json.Udemy }}",
+            "Google Docs-Temario": "=https://docs.google.com/document/d/1tl-rP__GSN5Gcj9Xsc4mICDw3EZF9rkcQMAExR_23wY/{{ $json.id }}"
+          },
+          "matchingColumns": [
+            "Nombre del Curso"
+          ],
+          "schema": [
+            {
+              "id": "Nombre del Curso",
+              "displayName": "Nombre del Curso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instructor",
+              "displayName": "Instructor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DevTalles",
+              "displayName": "DevTalles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Udemy",
+              "displayName": "Udemy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descripccion",
+              "displayName": "Descripccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Docs-Temario",
+              "displayName": "Google Docs-Temario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        112
+      ],
+      "id": "8758373e-8cc8-4950-8af7-3b254b573293",
+      "name": "Actualizar URL del temario",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ADNqzW2MOUstkv2d",
+          "name": "Obtener pokemons"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Información\nEres un asistente para extraer la descripción de un curso que\nrecibirás en formato Markdown y debes extraer toda la\ninformación relevante que después será usada para crear un\nDocumento de Google Docs.\n\nNo retornes nada más de lo que te necesito.\n\n## Ejemplo de salida:\nLa información de salida, en un formato que Google Docs pueda\ninterpretar, con saltos de línea y demás.\n\n{\n  information: 'xxxxxx'\n}",
+              "role": "system"
+            },
+            {
+              "content": "={{ $('Scrape Informacion de Udemy').item.json.data.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1120,
+        112
+      ],
+      "id": "1712ff9f-8945-4b2b-adda-a75ea761cbb4",
+      "name": "Enviar información a OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "huLW9eIBkoGT1u1x",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Enviamos informacion a OpenIA para extraer la informacion que queremos\n\n**",
+        "height": 112,
+        "width": 416,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "a95ffe6f-96cc-4e02-9520-63fd2a6b98ca",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "Get row(s) in sheet": [
+      {
+        "json": {
+          "row_number": 2,
+          "Sitio Web": "https://fernando-herrera.com/courses"
+        }
+      }
+    ],
+    "Enviar información a OpenAI": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": {
+              "courses": [
+                {
+                  "courseName": "Nest: Desarrollo backend escalable con Node",
+                  "instructorName": "Fernando Herrera",
+                  "devtallesUrl": "https://cursos.devtalles.com/courses/nest?coupon=BLACK25",
+                  "udemyUrl": "https://www.udemy.com/course/nest-framework/?couponCode=NOVIEMBRE-BEST-2025",
+                  "description": "Nest es un framework de node extensible, versátil y progresivo, el cual nos ofrece la columna vertebral de todo tipo de aplicaciones del lado del servidor.",
+                  "category": "Backend",
+                  "additionalInformation": null
+                },
+                {
+                  "courseName": "Principios: SOLID y Clean Code",
+                  "instructorName": "Fernando Herrera",
+                  "devtallesUrl": "https://cursos.devtalles.com/courses/solid-clean-code?coupon=BLACK25",
+                  "udemyUrl": "https://www.udemy.com/course/solid-clean/?couponCode=NOVIEMBRE-BEST-2025",
+                  "description": "Si hablamos de diseño y desarrollo de aplicaciones, Los principios S.O.L.I.D. son unas palabras que debes conocer como uno de los fundamentos de la arquitectura y desarrollo de software.",
+                  "category": "Infraestructura",
+                  "additionalInformation": null
+                },
+                {
+                  "courseName": "Docker: Guía práctica de uso para desarrolladores",
+                  "instructorName": "Fernando Herrera",
+                  "devtallesUrl": "https://cursos.devtalles.com/courses/docker-guia-practica?coupon=BLACK25",
+                  "udemyUrl": "https://www.udemy.com/course/docker-guia-practica/?couponCode=NOVIEMBRE-BEST-2025",
+                  "description": "Aquí aprenderás Docker y para qué te puede servir, aprende a utilizar y crear imágenes, controlar el versionamiento y construcción automática de las mismas.",
+                  "category": "Infraestructura",
+                  "additionalInformation": null
+                },
+                {
+                  "courseName": "FastAPI: Crea APIs eficientes con Python",
+                  "instructorName": "Ricardo Cuéllar",
+                  "devtallesUrl": "https://cursos.devtalles.com/courses/fastapi?coupon=BLACK25",
+                  "udemyUrl": "https://www.udemy.com/course/fastapi-apis-eficientes/?couponCode=NOVIEMBRE-BEST-2025",
+                  "description": "Aprende a crear API modernas, seguras y rápidas con Python, Pydantic, JWT, WebSockets, Webhooks Bases de datos, subida de archivos, despliegue, tareas asíncronas, seguridad, proyectos reales y mucho más.",
+                  "category": "Backend",
+                  "additionalInformation": null
+                },
+                {
+                  "courseName": "Patrones de Diseño: Soluciones prácticas y eficientes",
+                  "instructorName": "Fernando Herrera",
+                  "devtallesUrl": "https://cursos.devtalles.com/courses/patrones-diseno?coupon=BLACK25",
+                  "udemyUrl": "https://www.udemy.com/course/patrones-diseno/?couponCode=NOVIEMBRE-BEST-2025",
+                  "description": "¡24 Patrones de Diseño para resolver problemas comunes al programar, además de escribir código más limpio y escalable!",
+                  "category": "Desarrollo Web",
+                  "additionalInformation": null
+                }
+              ]
+            },
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Extraer Arreglo de Cursos": [
+      {
+        "json": {
+          "courseName": "Nest: Desarrollo backend escalable con Node",
+          "instructorName": "Fernando Herrera",
+          "devtallesUrl": "https://cursos.devtalles.com/courses/nest?coupon=BLACK25",
+          "udemyUrl": "https://www.udemy.com/course/nest-framework/?couponCode=NOVIEMBRE-BEST-2025",
+          "description": "Nest es un framework de node extensible, versátil y progresivo, el cual nos ofrece la columna vertebral de todo tipo de aplicaciones del lado del servidor.",
+          "category": "Backend",
+          "additionalInformation": null
+        }
+      }
+    ],
+    "Actualizar informacion General del Curso": [
+      {
+        "json": {
+          "Nombre del Curso": "Nest: Desarrollo backend escalable con Node",
+          "Instructor": "Fernando Herrera",
+          "DevTalles": "https://cursos.devtalles.com/courses/nest?coupon=BLACK25",
+          "Udemy": "https://www.udemy.com/course/nest-framework/?couponCode=NOVIEMBRE-BEST-2025",
+          "Descripccion": "Nest es un framework de node extensible, versátil y progresivo, el cual nos ofrece la columna vertebral de todo tipo de aplicaciones del lado del servidor.",
+          "Google Docs-Temario": ""
+        }
+      }
+    ],
+    "Scrape Informacion de Udemy": [
+      {
+        "json": {
+          "success": true,
+          "data": {
+            "markdown": "Last chance to level up\\| Prices as low as $9.99 during our [Black Friday Sale.](https://www.udemy.com/black-friday-cyber-monday-sales/)Ends in 12h 21m 9s.\n\n[Development](https://www.udemy.com/courses/development/) [Web Development](https://www.udemy.com/courses/development/web-development/) [NestJS](https://www.udemy.com/topic/nestjs/)\n\n![](https://img-c.udemycdn.com/course/240x135/4756420_66fc_4.jpg)Preview this course\n\n# Nest: Desarrollo backend escalable con Node\n\nREST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,\n\nBestseller\n\n[Rating: 4.8 out of 54.8(4,192 ratings)](https://www.udemy.com/course/nest-framework/#reviews)\n\n19,183 students\n\nCreated by [Fernando Herrera](https://www.udemy.com/course/nest-framework/#instructor-1), [{d/t} - DevTalles](https://www.udemy.com/course/nest-framework/#instructor-2)\n\nLast updated 9/2025\n\nSpanish\n\nSpanish \\[Auto\\]\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nDiscount50% off\n\n**12 hours** left at this price!\n\nAdd to cart\n\nBuy now\n\n30-Day Money-Back Guarantee\n\n## This course includes:\n\n- 24 hours on-demand video\n\n- 31 articles\n\n- 2 downloadable resources\n\n- Access on mobile and TV\n\n- Full lifetime access\n\n- Certificate of completion\n\n\nShare [Gift this course](https://www.udemy.com/join/signup-popup/?locale=en_US&response_type=html&return_link=https%3A%2F%2Fwww.udemy.com%2Fcourse%2Fnest-framework%2F%3FcouponCode%3DNOVIEMBRE-BEST-2025&source=course_landing_page&ref=&next=%2Fgift%2Fnest-framework%2F%3FcouponCode%3DCP251118BG1) Apply Coupon\n\n- **CP251118BG1** is applied\n- Udemy coupon\n\nApply couponApply\n\n![](https://img-c.udemycdn.com/course/240x135/4756420_66fc_4.jpg)Preview this course\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nDiscount50% off\n\n**12 hours** left at this price!\n\nAdd to cart\n\nBuy now\n\n30-Day Money-Back Guarantee\n\n## This course includes:\n\n- 24 hours on-demand video\n\n- 31 articles\n\n- 2 downloadable resources\n\n- Access on mobile and TV\n\n- Full lifetime access\n\n- Certificate of completion\n\n\nShare [Gift this course](https://www.udemy.com/join/signup-popup/?locale=en_US&response_type=html&return_link=https%3A%2F%2Fwww.udemy.com%2Fcourse%2Fnest-framework%2F%3FcouponCode%3DNOVIEMBRE-BEST-2025&source=course_landing_page&ref=&next=%2Fgift%2Fnest-framework%2F%3FcouponCode%3DCP251118BG1) Apply Coupon\n\n- **CP251118BG1** is applied\n- Udemy coupon\n\nApply couponApply\n\n## Training 2 or more people?\n\nGet your team access to 30,000+ top Udemy courses anytime, anywhere.\n\n[Try Udemy Business](https://www.udemy.com/udemy-business/?locale=en_US&path=request-demo-mx%2F&ref=marketplace_control_development&utm_campaign=mx-hooks&utm_content=clp&utm_medium=referral&utm_source=marketplace&utm_term=)\n\nNest: Desarrollo backend escalable con Node\n\nBestseller\n\n[Rating: 4.8 out of 54.8(4,192 ratings)](https://www.udemy.com/course/nest-framework/#reviews)\n\n19,183 students\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nAdd to cart\n\nOverviewCurriculumInstructorReviews\n\n## What you'll learn\n\n- Nest con TypeScript\n\n- Backend servers con Node\n\n- Restful APIS robustas y seguras\n\n- Conexiones con bases de datos SQL y NoSQL\n\n- Websockets\n\n- Validaciones de data y tipos\n\n- Nest Guards, interceptors, pipes, controllers, decorators, services, filters, modules y middlewares\n\n\n## Explore related topics\n\n- [NestJS](https://www.udemy.com/topic/nestjs/)\n- [Web Development](https://www.udemy.com/courses/development/web-development/)\n- [Development](https://www.udemy.com/courses/development/)\n\n## This course includes:\n\n- 24 hours on-demand video\n\n- 31 articles\n\n- 2 downloadable resources\n\n\n- Access on mobile and TV\n\n- Certificate of completion\n\n\n## Course content\n\n17 sections • 224 lectures • 24h 8m total length\n\nExpand all sections\n\n### Introducción al curso7 lectures • 37min\n\n- Video introductorio\n\n\n\nPreview02:31\n\n- Introducción al curso\n\n\n\n05:37\n\n- ¿Cómo funcionará el curso?\n\n\n\n06:15\n\n- ¿Preguntas?\n\n\n\n05:20\n\n- Instalaciones recomendadas\n\n\n\n13:47\n\n- Material adicional - Guía de Atajos\n\n\n\n03:28\n\n- ¡Únete a Nuestra Comunidad de DevTalles en Discord!\n\n\n\n00:18\n\n\n### Breve introducción a TypeScript y conocimientos generales necesarios18 lectures • 2hr 12min\n\n- Introducción a la sección\n\n\n\nPreview01:18\n\n- Temas puntuales de la sección\n\n\n\n00:17\n\n- Preparación del proyecto\n\n\n\nPreview07:27\n\n- Tipos y bases sobre módulos\n\n\n\nPreview08:57\n\n- Tipos de datos - continuación\n\n\n\n07:07\n\n- Objetos e interfaces\n\n\n\n10:48\n\n- Tipos en arreglos\n\n\n\n04:36\n\n- Clases y forma abreviada\n\n\n\n12:00\n\n- Getters, métodos y THIS\n\n\n\n08:31\n\n- Métodos asíncronos\n\n\n\n10:16\n\n- Colocar tipo de dato a respuestas http (genéricos)\n\n\n\n10:17\n\n- Inyección de dependencias\n\n\n\nPreview12:02\n\n- Genéricos + Sustitución de Liskov\n\n\n\n08:05\n\n- Resolver el principio de sustitución\n\n\n\n06:48\n\n- Decoradores\n\n\n\n09:53\n\n- Decorador de método - @Deprecated\n\n\n\n06:46\n\n- Resumen de lo aprendido\n\n\n\n06:51\n\n- Código fuente de la sección\n\n\n\n00:08\n\n\n### Primeros pasos en Nest16 lectures • 1hr 50min\n\n- Introducción a la sección\n\n\n\n03:40\n\n- Temas puntuales de la sección\n\n\n\n00:12\n\n- ¿Qué es Nest? y ¿Por qué usarlo?\n\n\n\n11:21\n\n- Instalar Nest CLI - Command Line Interface\n\n\n\n03:11\n\n- Generar nuestro primer proyecto - CarDealership\n\n\n\n06:37\n\n- Explicación de cada archivo y directorio\n\n\n\nPreview12:40\n\n- Módulos\n\n\n\n08:04\n\n- Controladores\n\n\n\n09:44\n\n- Desactivar Prettier\n\n\n\n01:36\n\n- Obtener un carro por ID\n\n\n\n10:12\n\n- Servicios\n\n\n\n06:33\n\n- Inyección de dependencias\n\n\n\n09:46\n\n- Pipes\n\n\n\n09:43\n\n- Exception Filters\n\n\n\nPreview07:30\n\n- Post, Patch y Delete\n\n\n\n09:18\n\n- Código fuente de la sección\n\n\n\n00:08\n\n\n### DTOs y Validación de información14 lectures • 1hr 26min\n\n- Introducción a la sección\n\n\n\n03:32\n\n- Temas puntuales de la sección\n\n\n\n00:09\n\n- Continuación de la sección\n\n\n\n04:54\n\n- Interfaces y UUID\n\n\n\n10:48\n\n- Pipe - ParseUUIDPipe\n\n\n\n05:22\n\n- DTO - Data Transfer Object\n\n\n\n08:29\n\n- ValidationPipe - Class Validator y Class Transformer\n\n\n\n08:34\n\n- Pipes Globales - A nivel de Aplicación\n\n\n\n08:09\n\n- Crear el nuevo carro\n\n\n\n06:48\n\n- Actualizar un carro\n\n\n\n08:34\n\n- Actualizar el listado de carros\n\n\n\n08:36\n\n- Borrar un carro\n\n\n\n04:50\n\n- Resumen de la sección\n\n\n\n07:26\n\n- Código fuente de la sección\n\n\n\n00:08\n\n\n### Nest CLI Resource - Brands CRUD9 lectures • 53min\n\n- Introducción a la sección\n\n\n\n02:58\n\n- Temas puntuales de la sección\n\n\n\n00:13\n\n- Continuación de la sección\n\n\n\n02:42\n\n- Nest CLI Resource - Brands\n\n\n\n11:41\n\n- Crear CRUD completo de Brands\n\n\n\n14:18\n\n- Crear servicio SEED para cargar datos\n\n\n\n05:10\n\n- Preparar servicios para insertar SEED\n\n\n\n07:00\n\n- Inyectar servicios en otros servicios\n\n\n\n09:19\n\n- Código fuente de la sección\n\n\n\n00:05\n\n\n### Generar build de producción básico2 lectures • 6min\n\n- Introducción a la sección\n\n\n\n01:20\n\n- Generar build de producción básico\n\n\n\n04:41\n\n\n### MongoDB Pokedex20 lectures • 2hr 3min\n\n- Introducción a la sección\n\n\n\n03:30\n\n- Temas puntuales de la sección\n\n\n\n00:09\n\n- Inicio de proyecto - Pokedex\n\n\n\n04:50\n\n- Servir contenido estático\n\n\n\n06:09\n\n- Global Prefix\n\n\n\n05:36\n\n- Docker - DockerCompose - MongoDB\n\n\n\n10:29\n\n- README.md\n\n\n\n03:34\n\n- Conectar Nest con Mongo\n\n\n\n05:41\n\n- Crear esquemas y Modelos\n\n\n\n10:33\n\n- POST - Recibir y validar la data\n\n\n\n06:49\n\n- Crear Pokémon en base de datos\n\n\n\n05:29\n\n- Responder un error específico\n\n\n\n09:59\n\n- FindOneBy - Buscar por nombre, MongoId y no\n\n\n\nPreview10:51\n\n- Actualizar Pokemon en base de datos\n\n\n\n08:01\n\n- Tarea - Validar valores únicos\n\n\n\n05:28\n\n- Eliminar un Pokemon\n\n\n\n04:37\n\n- CustomPipes - ParseMongoIdPipe\n\n\n\n10:47\n\n- Validar y eliminar en una sola consulta\n\n\n\n06:38\n\n- Respaldar código fuente en GitHub\n\n\n\n03:32\n\n- Código fuente de la sección\n\n\n\n00:05\n\n\n### Seed y Paginación13 lectures • 1hr 8min\n\n- Introducción a la sección\n\n\n\n02:05\n\n- Temas puntuales de la sección\n\n\n\n00:09\n\n- Continuación de proyecto\n\n\n\n02:51\n\n- Crear módulo SEED\n\n\n\n05:50\n\n- Nota de actualización - Axios\n\n\n\n00:20\n\n- Realizar petición http desde Nest\n\n\n\n11:22\n\n- Tarea - Insertar Pokemons por lote\n\n\n\n04:32\n\n- Resolución - Insertar Pokemons por lote\n\n\n\n06:01\n\n- Insertar multiples registros simultáneamente\n\n\n\n08:33\n\n- Crear un custom provider - opcional\n\n\n\n10:22\n\n- Paginación de Pokemons\n\n\n\n08:29\n\n- Transform DTOs\n\n\n\n07:01\n\n- Código fuente de la sección\n\n\n\n00:04\n\n\n### Variables de entorno - Deployment y Dockerizar la aplicación17 lectures • 2hr\n\n- Introducción a la sección\n\n\n\n02:29\n\n- Temas puntuales de la sección\n\n\n\n00:05\n\n- Continuación de proyecto\n\n\n\n04:41\n\n- Configuración de variables de entorno\n\n\n\n06:49\n\n- Configuration Loader\n\n\n\n11:26\n\n- ConfigurationService\n\n\n\n11:15\n\n- joi - ValidationSchema\n\n\n\n08:31\n\n- ENV Template - Readme\n\n\n\n04:26\n\n- MongoDB - Aprovisionamiento\n\n\n\n09:06\n\n- Desplegar aplicación en la nube\n\n\n\n08:48\n\n- Bonus - Docker ¿Dockerizar?\n\n\n\n04:12\n\n- Bonus: Explicación general del Dockerfile\n\n\n\n15:23\n\n- Bonus: Definir la construcción de la imagen\n\n\n\n12:21\n\n- Bonus: Construir la imagen\n\n\n\n09:44\n\n- Bonus: Conservar la base de datos y analizar imagen\n\n\n\n07:18\n\n- Actualizar Readme.md\n\n\n\n03:47\n\n- Código fuente de la sección\n\n\n\n00:07\n\n\n### TypeORM - Postgres19 lectures • 2hr 14min\n\n- Introducción a la sección\n\n\n\n02:56\n\n- Temas puntuales de la sección\n\n\n\n00:07\n\n- Inicio de proyecto - TesloShop\n\n\n\n05:24\n\n- Docker - Instalar y correr Postgres\n\n\n\n10:31\n\n- Conectar Postgres con Nest\n\n\n\n10:05\n\n- TypeORM - Entity - Product\n\n\n\n08:08\n\n- Entidad sin relaciones\n\n\n\n07:05\n\n- Create Product DTO\n\n\n\n07:56\n\n- Insertar usando TypeORM\n\n\n\n10:17\n\n- Manejo de errores\n\n\n\n07:34\n\n- BeforeInsert y BeforeUpdate\n\n\n\n08:27\n\n- Get y Delete TypeORM\n\n\n\n08:56\n\n- Paginar en TypeORM\n\n\n\n09:34\n\n- Buscar por Slug o UUID\n\n\n\nPreview05:47\n\n- QueryBuilder\n\n\n\n07:47\n\n- Update en TypeORM\n\n\n\n09:38\n\n- BeforeUpdate\n\n\n\n05:00\n\n- Nueva columna - Tags\n\n\n\n08:40\n\n- Código fuente de la sección\n\n\n\n00:04\n\n\n7 more sections\n\n## Requirements\n\n- Conocimiento de JavaScript es necesario\n\n- Bases de TypeScript son recomendadas\n\n- Tener una idea general de Node es recomendado\n\n- Tener una idea de programación orientada a objetos es recomendada pero no necesaria\n\n\n## Description\n\nBienvenidos a mi curso completo sobre **Nest**\n\n**Nest es un framework de node** extensible, versátil y progresivo, el cual nos ofrece la columna vertebral de todo tipo de aplicaciones del lado del servidor. Con Nest tendremos el poder de crear backend servers siguiendo las buenas prácticas recomendadas por el **equipo de Nest** y el mismo **Kamil Mysliwiec**(autor de Nest)\n\nEl curso parte de cero conocimiento de Nest y TypeScript y poco a poco vamos creando aplicaciones más complejas hasta desplegarlas en producción.\n\nPuntualmente veremos temas como:\n\n01. Core building blocks\n\n    1. Services\n\n    2. Controllers\n\n    3. Providers\n\n    4. Decorators\n\n    5. Gateways\n\n    6. Guards\n\n    7. Interceptors\n\n    8. Exception Filters\n\n    9. Modules\n02. Docker\n\n    1. Docker-compose\n\n    2. Dockerization\n03. CORS\n\n04. Websockets\n\n05. Autentication y Authorization basado en roles\n\n06. JWTs\n\n07. Ciclo de vida de una petición\n\n08. Nest CLI\n\n09. Transacciones de base de datos\n\n10. Secuencias y UUID\n\n11. Restful endpoints\n\n12. Control de versiones con Git\n\n13. Despliegues a producción.\n\n14. Class transformation\n\n15. Validaciones de inicio a fin de un request\n\n16. DTOs\n\n17. TypeORM\n\n18. Postgres\n\n19. MongoDB\n\n20. TypeORM y Mongoose\n\n21. Patrón repository para TypeORM\n\n22. Schemas de Mongo\n\n23. Core building blocks personalizados\n\n24. Global Pipes, Filters, Exceptions.\n\n25. Carga y validación de archivos\n\n26. Principios SOLID\n\n27. Documentación automática y semi-automática\n\n28. Estructuras siguiendo las prácticas recomendadas por el equipo de Nest\n\n29. Ciclo de vida de Nest\n\n30. TypeScript\n\n31. Genericos e interfaces.\n\n32. Mucho mas.\n\n\nEl curso está pensado para ayudarlos **a empezar en Nest como para mejorar sus habilidades en este framework** tan poderoso, adicionalmente cuenta con un cheat-sheet personalizado por mi para ayudarlos en el aprendizaje que pueden imprimir y compartir.\n\n**Bases necesarias:**\n\nIdealmente el curso necesita conocimiento básico de JavaScript, Node y TypeScript, siempre soy de la opinión que para aprender un framework que se basa en JavaScript, es necesario tener las bases del mismo para no confundir conceptos. Si bien es cierto que el curso cuenta con las bases de TypeScript, es ideal conocerlo para no sentir la curva de aprendizaje alta.\n\n## Who this course is for:\n\n- Backend developers\n- Desarrolladores que quieran construir restful APIs\n- Personas con conocimiento de Nest que quieran mejorar habilidades\n\nShow moreShow less\n\n## Students also bought\n\n[NestJS: The Complete Developer's Guide](https://www.udemy.com/course/nestjs-the-complete-developers-guide/)\n\nBestseller\n\n20 total hoursUpdated 11/2025\n\nRating: 4.7 out of 54.751,027\n\nCurrent price$9.99\n\nOriginal Price~~$89.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/4174580_dd1c.jpg)\n\n[NestJS Masterclass - NodeJS Framework Backend Development](https://www.udemy.com/course/nestjs-masterclass-complete-course/)\n\nPremium\n\n24.5 total hoursUpdated 2/2025\n\nRating: 4.7 out of 54.74,220\n\nCurrent price$9.99\n\nOriginal Price~~$89.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/6048973_c5b2_17.jpg)\n\n[NestJS Mastery: Build & Deploy a Production-Ready API](https://www.udemy.com/course/master-nestjs-the-javascript-nodejs-framework/)\n\nPremium\n\n25.5 total hoursUpdated 8/2025\n\nRating: 4.7 out of 54.78,636\n\nCurrent price$9.99\n\nOriginal Price~~$74.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/3510096_5891_2.jpg)\n\n[NestJS Zero to Hero - Modern TypeScript Back-end Development](https://www.udemy.com/course/nestjs-zero-to-hero/)\n\nPremium\n\n9 total hoursUpdated 3/2024\n\nRating: 4.6 out of 54.6130,274\n\nCurrent price$10.99\n\nOriginal Price~~$94.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/2053219_e620_2.jpg)\n\n[NestJS Microservices: Build & Deploy a Scaleable Backend](https://www.udemy.com/course/nestjs-microservices-build-deploy-a-scaleable-backend/)\n\nPremium\n\n10 total hoursUpdated 9/2025\n\nRating: 4.7 out of 54.78,505\n\nCurrent price$9.99\n\nOriginal Price~~$84.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/5246048_ff14_2.jpg)\n\n[NestJS Microservices: Build a Distributed Job Engine](https://www.udemy.com/course/nestjs-microservices-build-a-distributed-job-engine/)\n\nPremium\n\n15 total hoursUpdated 3/2025\n\nRating: 4.6 out of 54.61,175\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n![](https://img-c.udemycdn.com/course/50x50/6436625_ec3f.jpg)\n\n## NestJS: Guía completa\n\n![](https://img-c.udemycdn.com/course/240x135/4756420_66fc_4.jpg)\n\n### [Nest: Desarrollo backend escalable con Node\\ REST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,Rating: 4.8 out of 54192 reviews24 total hours224 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/nest-framework/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.8 out of 54.8(4,192)\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nBestseller\n\n![](https://img-c.udemycdn.com/course/240x135/5842804_a5bb_4.jpg)\n\n### [NestJS + Microservicios: Aplicaciones escalables y modulares\\ NATS, Webhooks, CI/CD, Git submodules, Gateways, Docker, Kubernetes, GCloud, PosstgreSQL, Mongo, SQLiteRating: 4.9 out of 5894 reviews21 total hours196 lecturesIntermediateCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/nestjs-microservicios/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.9 out of 54.9(894)\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nBestseller\n\n![](https://img-c.udemycdn.com/course/240x135/4826048_b173_2.jpg)\n\n### [Nest + GraphQL: Evoluciona tus APIs\\ Autenticación, autorización, DigitalOcean, Docker, Docker Hub, code first, queries, mutations, enumeraciones y másRating: 4.9 out of 5645 reviews18.5 total hours164 lecturesIntermediateCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/nest-graphql/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.9 out of 54.9(645)\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nBestseller\n\nTotal:\n\nCurrent price$29.97\n\nOriginal Price~~$59.97~~\n\nAdd all to cart\n\n## Instructors\n\n[Fernando Herrera](https://www.udemy.com/user/550c38655ec11/)\n\nA Full-Stack Developer & Teacher\n\n[![](https://img-c.udemycdn.com/user/200_H/11767934_4361_2.jpg)](https://www.udemy.com/user/550c38655ec11/)\n\n- 4.8 Instructor Rating\n\n- 305,584 Reviews\n\n- 656,747 Students\n\n- 57 Courses\n\n\nSoy un analista programador de sistemas de computo, con poco más de 19 años en el mundo del desarrollo de aplicaciones frontend y backend.\n\nDurante mis últimos años me he dedicado a la enseñanza en línea,  mientras trabajo en una empresa en Canadá.\n\nMe encanta enseñar y programar, son mis dos pasatiempos favoritos que a su vez, es mi trabajo.\n\n[{d/t} - DevTalles](https://www.udemy.com/user/soporte-cursos-2/)\n\nPlataforma Educativa\n\n[![](https://img-c.udemycdn.com/user/200_H/267457580_ae55.jpg)](https://www.udemy.com/user/soporte-cursos-2/)\n\n- 4.8 Instructor Rating\n\n- 222,092 Reviews\n\n- 574,872 Students\n\n- 52 Courses\n\n\nDevTalles es una plataforma educativa en línea creada por Fernando Herrera que se especializa en cursos de desarrollo web y programación. Ofrece una variedad de cursos en tecnologías populares como React, Angular, Vue.js, TypeScript, SQL, y herramientas de inteligencia artificial. Estos cursos están diseñados tanto para principiantes como para desarrolladores avanzados que deseen profundizar sus conocimientos y adquirir habilidades competitivas.\n\n## More Courses by [Fernando Herrera](https://www.udemy.com/user/550c38655ec11/)\n\n![](https://img-c.udemycdn.com/course/240x135/5500812_5acb_6.jpg)\n\n### [NodeJS: De cero a experto\\ Clean Architecture, DDD, WebHooks, WebSockets, Tareas automáticas, Despliegues, TypeScript, Edge, Testing y másRating: 4.7 out of 52267 reviews37.5 total hours389 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/nodejs-de-cero-a-experto/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.7 out of 54.7(2,267)\n\n37.5 total hours389 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n![](https://img-c.udemycdn.com/course/240x135/3662358_4d6e_5.jpg)\n\n### [Angular: De cero a experto - Edición 2025\\ Signals, componentes, servicios, zoneless, mapas, autenticación, despliegues, carga de archivos, Git, GitHub y mucho másRating: 4.8 out of 518755 reviews33.5 total hours345 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/angular-fernando-herrera/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.8 out of 54.8(18,755)\n\n33.5 total hours345 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n![](https://img-c.udemycdn.com/course/240x135/5132066_04b4_4.jpg)\n\n### [Flutter - Móvil: De cero a experto\\ Riverpod, BLoC, push y local notifications, DDD, cámara, videos, JWT, go\\_router, material 3, App Stores y másRating: 4.8 out of 55494 reviews50 total hours463 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/flutter-cero-a-experto/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.8 out of 54.8(5,494)\n\n50 total hours463 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n## More Courses by [{d/t} - DevTalles](https://www.udemy.com/user/soporte-cursos-2/)\n\n![](https://img-c.udemycdn.com/course/240x135/5500812_5acb_6.jpg)\n\n### [NodeJS: De cero a experto\\ Clean Architecture, DDD, WebHooks, WebSockets, Tareas automáticas, Despliegues, TypeScript, Edge, Testing y másRating: 4.7 out of 52267 reviews37.5 total hours389 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/nodejs-de-cero-a-experto/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.7 out of 54.7(2,267)\n\n37.5 total hours389 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n![](https://img-c.udemycdn.com/course/240x135/3662358_4d6e_5.jpg)\n\n### [Angular: De cero a experto - Edición 2025\\ Signals, componentes, servicios, zoneless, mapas, autenticación, despliegues, carga de archivos, Git, GitHub y mucho másRating: 4.8 out of 518755 reviews33.5 total hours345 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/angular-fernando-herrera/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.8 out of 54.8(18,755)\n\n33.5 total hours345 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\n![](https://img-c.udemycdn.com/course/240x135/5132066_04b4_4.jpg)\n\n### [Flutter - Móvil: De cero a experto\\ Riverpod, BLoC, push y local notifications, DDD, cámara, videos, JWT, go\\_router, material 3, App Stores y másRating: 4.8 out of 55494 reviews50 total hours463 lecturesAll LevelsCurrent price: $9.99Original price: $19.99](https://www.udemy.com/course/flutter-cero-a-experto/)\n\nInstructors:\n\nFernando Herrera, {d/t} - DevTalles\n\nRating: 4.8 out of 54.8(5,494)\n\n50 total hours463 lecturesAll Levels\n\nCurrent price$9.99\n\nOriginal Price~~$19.99~~\n\nReport abuse\n\n![Udemy logo](https://cdn.cookielaw.org/logos/c7d0d27d-e055-4572-8927-d3c994df5f60/01993998-4d83-7b89-ba6c-9832e3ea37fe/5e4ae68b-8ab5-4c4d-a496-e5df724af69f/udemy-logo.png)\n\n## Privacy Preference Center\n\nYour Opt Out Preference Signal is Honored\n\n## Privacy Preference Center\n\n- ### Cookie Preferences\n\n- ### Functional Cookies\n\n- ### Advertising Cookies\n\n- ### Social Media Cookies\n\n- ### Performance Cookies\n\n- ### Strictly Necessary Cookies\n\n\n#### Cookie Preferences\n\nWe use cookies to store or retrieve information on your browser. This information may relate to you, your preferences, or your device and is mostly used to make the site work as you expect it to. Because we respect your right to privacy, you can choose not to allow some types of cookies. Click on the different category headings to find out more and change your settings. However, blocking some types of cookies may impact your experience of the site and the services we are able to offer.\n\n\n[View Privacy Policy](https://www.udemy.com/terms/privacy/)\n\n#### Functional Cookies\n\nFunctional CookiesActive\n\nThese cookies enable the website to provide enhanced functionality and personalisation. They may be set by us or by third party providers whose services we have added to our pages. If you do not allow these cookies then some or all of these services may not function properly.\n\nCookies Details\n\n#### Advertising Cookies\n\nAdvertising CookiesActive\n\nThese cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites. They do not store personally identifiable information but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will experience less targeted advertising.\n\nCookies Details\n\n#### Social Media Cookies\n\nSocial Media CookiesActive\n\nThese cookies are set by social media services that we have added to the site to enable you to share our content with your friends and networks. They are capable of tracking your browser across other sites and building up a profile of your interests. This may impact the content and messages you see on other websites you visit. If you do not allow these cookies you may not be able to use or see these sharing tools.\n\nCookies Details\n\n#### Performance Cookies\n\nPerformance CookiesActive\n\nThese cookies allow us to count visits and measure activity so we can improve the performance of our site. They help us to know which pages are the most and least popular and see how users move around the site. If you do not allow these cookies, we will not be able to monitor its performance.\n\nCookies Details\n\n#### Strictly Necessary Cookies\n\nAlways Active\n\nThese cookies are necessary for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms. You can set your browser to block or alert you about these cookies, but some parts of the site will not then work. These cookies do not store any personally identifiable information.\n\nCookies Details\n\nBack Button\n\n### Cookie List\n\nFilter Button\n\nConsentLeg.Interest\n\ncheckbox labellabel\n\ncheckbox labellabel\n\ncheckbox labellabel\n\nClear\n\n- checkbox labellabel\n\n\nApplyCancel\n\nConfirm My Choices\n\nReject AllAllow All\n\n[![Powered by Onetrust](https://cdn.cookielaw.org/logos/static/powered_by_logo.svg)](https://www.onetrust.com/products/cookie-consent/)\n\nStripeM-Inner\n\n## Add course to cart?\n\nPlease confirm that you want to add this course to your cart\n\nCancelAdd to cart",
+            "metadata": {
+              "udemy_com:price": "$19.99",
+              "msapplication-TileImage": "/staticx/udemy/images/v7/mstile-144x144.png",
+              "fb:app_id": "313137469260",
+              "msapplication-config": "/staticx/udemy/images/v7/browserconfig.xml",
+              "udemy_com:instructor": "https://www.udemy.com/user/550c38655ec11/",
+              "viewport": [
+                "width=device-width, initial-scale=1.0, minimum-scale=1.0",
+                "width=device-width, initial-scale=1.0"
+              ],
+              "twitter:domain": "www.udemy.com",
+              "twitter:url": "https://www.udemy.com/course/nest-framework/",
+              "application-name": "Udemy",
+              "twitter:title": "Nest: Desarrollo backend escalable con Node",
+              "udemy_com:category": "Development",
+              "ogLocale": "en_US",
+              "theme-color": "#ffffff",
+              "msapplication-TileColor": "#a435f0",
+              "ogImage": "https://img-c.udemycdn.com/course/480x270/4756420_66fc_4.jpg",
+              "language": "en-us",
+              "medium": "mult",
+              "og:url": "https://www.udemy.com/course/nest-framework/",
+              "og:type": "udemy_com:course",
+              "description": "REST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,",
+              "og:title": "Nest: Desarrollo backend escalable con Node",
+              "ogSiteName": "Udemy",
+              "ogTitle": "Nest: Desarrollo backend escalable con Node",
+              "og:image": "https://img-c.udemycdn.com/course/480x270/4756420_66fc_4.jpg",
+              "apple-itunes-app": "app-id=562413829, affiliate-data=ct=Safari_SmartBanner&amp;pt=1240482",
+              "ogDescription": "REST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,",
+              "ogUrl": "https://www.udemy.com/course/nest-framework/",
+              "og:locale": "en_US",
+              "twitter:image": "https://img-c.udemycdn.com/course/480x270/4756420_66fc_4.jpg",
+              "google-play-app": "app-id=com.udemy.android",
+              "og:description": "REST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,",
+              "title": "Nest: Desarrollo backend escalable con Node | Udemy",
+              "og:image:secure_url": "https://img-c.udemycdn.com/course/480x270/4756420_66fc_4.jpg",
+              "udemy_com:available": "1",
+              "og:site_name": "Udemy",
+              "twitter:card": "summary_large_image",
+              "twitter:description": "REST, TypeScript, Websockets, Autenticación, Authorización, Docker, Mongo, Postgres, TypeOrm,",
+              "twitter:site": "@udemy",
+              "favicon": "https://www.udemy.com/staticx/udemy/images/v8/favicon-32x32.png",
+              "scrapeId": "019accb9-2350-71f7-a5a2-393ee9dd31e5",
+              "sourceURL": "https://www.udemy.com/course/nest-framework/?couponCode=NOVIEMBRE-BEST-2025",
+              "url": "https://www.udemy.com/course/nest-framework/?couponCode=CP251118BG1",
+              "statusCode": 200,
+              "contentType": "text/html; charset=utf-8",
+              "proxyUsed": "basic",
+              "cacheState": "hit",
+              "cachedAt": "2025-11-28T19:38:51.934Z",
+              "creditsUsed": 1
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Obtener sitios a investigar": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio manual de procesos": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filtrar sitios Web con enlace",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar sitios Web con enlace": {
+      "main": [
+        [
+          {
+            "node": "Obtener Html del Sitio Web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Html del Sitio Web": {
+      "main": [
+        [
+          {
+            "node": "Transformar a Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transformar a Markdown": {
+      "main": [
+        [
+          {
+            "node": "Enviar información a OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar información a OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Extraer Arreglo de Cursos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Arreglo de Cursos": {
+      "main": [
+        [
+          {
+            "node": "barrer cada Curso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "barrer cada Curso": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Actualizar informacion General del Curso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fin de lectura del curso": {
+      "main": [
+        [
+          {
+            "node": "barrer cada Curso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar informacion General del Curso": {
+      "main": [
+        [
+          {
+            "node": "Scrape Informacion de Udemy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Scrape Informacion de Udemy": {
+      "main": [
+        [
+          {
+            "node": "Crear documento del curso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear documento del curso": {
+      "main": [
+        [
+          {
+            "node": "Actualizar URL del temario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar temario dentro del documento en docs": {
+      "main": [
+        [
+          {
+            "node": "Fin de lectura del curso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar URL del temario": {
+      "main": [
+        [
+          {
+            "node": "Enviar información a OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar información a OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Actualizar temario dentro del documento en docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c7f8eaca-8daf-465f-9429-1f63e7798304",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edee4fdb0e6ddb09141983ae34a6a0bdc11efabbbd40bec9e217372c56e50596"
+  },
+  "id": "ZLsvbwKmZVjJzy2E",
+  "tags": [
+    {
+      "updatedAt": "2025-11-28T21:02:53.772Z",
+      "createdAt": "2025-11-28T21:02:53.772Z",
+      "id": "8aYiMnaQqS2TTUPE",
+      "name": "scraping"
+    }
+  ]
+}

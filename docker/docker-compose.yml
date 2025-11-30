@@ -1,34 +1,49 @@
-version: "3.8"
+
+
+version: '3.8'
+
+#services:
+ # postgres:
+  #  image: postgres:16
+   # container_name: postgres_n8nDev
+    #restart: always
+    #ports:
+    #  - "5432:5432"
+    #env_file:
+     # - ../.env  # Ruta relativa al archivo .env
+    #volumes:
+     # - postgres_data:/var/lib/postgresql/data
+    #healthcheck:
+     # test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      #interval: 5s
+      #timeout: 5s
+      #retries: 5
+
 
 services:
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: n8n_proyectos
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_n8nDev
     restart: always
-
-    # Exposición de puertos
     ports:
-      - "5678:5678"
-
-    # Monta el volumen de workflows dentro del contenedor
-    volumes:
-      - ../workflows:/home/node/.n8n/workflows
-      - n8n_data:/home/node/.n8n  # Datos persistentes (base de datos interna)
-
-    # Archivo de entorno
+      - "3306:3306"
     env_file:
-      - ../.env
-
-    # Variables adicionales
+      - .env   # IGUAL que tu ejemplo con postgres
     environment:
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
-      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
-      - N8N_RUNNERS_ENABLED=true
-      - N8N_VERSION_CONTROL_ENABLED=true
-      - N8N_VERSION_CONTROL_GIT_REPO_URL=https://github.com/BrandonGS22b/N8n_Proyectos.git
-      - N8N_VERSION_CONTROL_GIT_BRANCH=main
-      - N8N_VERSION_CONTROL_GIT_AUTHOR_NAME=BrandonGS22b
-      - N8N_VERSION_CONTROL_GIT_AUTHOR_EMAIL=brandondulian@hotmail.com
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  n8n_data:
+  mysql_data:
+
+#volumes:
+ # postgres_data:
