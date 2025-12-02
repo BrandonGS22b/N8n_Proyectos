@@ -13,6 +13,7 @@ El proyecto está diseñado para ser fácilmente desplegado mediante **Docker** 
 | 💼 **Agente Empresa** | Automatiza la gestión de solicitudes empresariales y envío de reportes por correo. | [Ver documentación](./docs/Agente_Empresa.md) |
 | 👕 **Gestión de Solicitudes y Stock de T-Shirts (n8n)** | Flujo automatizado que procesa solicitudes de camisetas desde Google Sheets, verifica stock en PostgreSQL y actualiza el inventario y estado de las solicitudes. | [Ver documentación](./docs/Proyecto_gestionCamisas.md) |
 | 🧩 **Extracción y Actualización Automática de Cursos (Scraping)** | Flujo que analiza sitios web, extrae cursos usando IA, actualiza información, genera documentos y temarios automáticamente. | [Ver documentación](./docs/Scraping-curso.md) |
+| 🌐 **Agente IA con Consulta a Wikipedia** | Agente inteligente que usa modelos de IA, memoria en MongoDB y acceso a herramientas externas como Wikipedia para obtener información real en tiempo real. | [Ver documentación](./docs/Wikipedia-Agente.md) |
 
 ---
 
