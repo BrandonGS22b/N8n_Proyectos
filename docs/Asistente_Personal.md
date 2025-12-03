@@ -13,6 +13,11 @@ Este flujo es el agente central que interpreta mensajes del usuario mediante un 
 
 ---
 
+## 🧠 Repositorio del flujo
+![Flujo Asistente Personal](../workflows/AI_Agent_Principal.json)  
+
+---
+
 ## 📘 Descripción General
 
 El agente se activa cuando llega un mensaje del usuario y decide qué acción realizar basándose en la intención detectada por IA.  
@@ -55,7 +60,7 @@ E importa el flujo desde:
 
 bash
 Copiar código
-/workflows/Agentes/Asistente Personal.json
+(../workflows/AI_Agent_Principal.json)  
 ✉️ Autor
 Brandon Suárez
 📧 brandondulian36@gmail.com
