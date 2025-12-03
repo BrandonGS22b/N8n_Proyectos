@@ -1,0 +1,166 @@
+{
+  "name": "MCP-Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "brandondulian36@gmail.com",
+          "mode": "list",
+          "cachedResultName": "brandondulian36@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        64
+      ],
+      "id": "178cf733-f20c-400a-8ae5-7c91e02fad5a",
+      "name": "obtener_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "3IoiCxYlNJkDT7ee",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "brandondulian36@gmail.com",
+          "mode": "list",
+          "cachedResultName": "brandondulian36@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        64
+      ],
+      "id": "9317ad00-467b-4ff9-bee7-9cc935fcadbd",
+      "name": "eliminar_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "3IoiCxYlNJkDT7ee",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "0efc21ff-1a69-43eb-b037-643eee11179c"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -240
+      ],
+      "id": "36c89e19-e93e-4b35-95ab-99521fd270ff",
+      "name": "MCP Server Calendar",
+      "webhookId": "0efc21ff-1a69-43eb-b037-643eee11179c"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "brandondulian36@gmail.com",
+          "mode": "list",
+          "cachedResultName": "brandondulian36@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Use_Default_Reminders', ``, 'boolean') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        64
+      ],
+      "id": "2f6eb82e-274a-4b4c-80fa-5c524b65c33d",
+      "name": "crear_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "3IoiCxYlNJkDT7ee",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "obtener_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "eliminar_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "60797a96-8308-4f95-9a3d-46fe0b675219",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edee4fdb0e6ddb09141983ae34a6a0bdc11efabbbd40bec9e217372c56e50596"
+  },
+  "id": "t6vSbojWYnNL32jf",
+  "tags": [
+    {
+      "updatedAt": "2025-12-02T20:44:26.307Z",
+      "createdAt": "2025-12-02T20:44:26.307Z",
+      "id": "LdOh15P4v73ZVRQp",
+      "name": "MCP"
+    },
+    {
+      "updatedAt": "2025-12-02T20:44:34.239Z",
+      "createdAt": "2025-12-02T20:44:34.239Z",
+      "id": "xzOuCwldQ9G58hnC",
+      "name": "Server"
+    }
+  ]
+}

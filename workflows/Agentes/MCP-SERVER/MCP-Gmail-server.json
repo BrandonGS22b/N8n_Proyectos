@@ -1,0 +1,145 @@
+{
+  "name": "MCP-Gmail-server",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        176
+      ],
+      "id": "e10c287a-921f-41b4-9017-d3bceb43ca94",
+      "name": "enviar_correo",
+      "webhookId": "57c1d7f4-3aa9-468a-9f66-8a457844acc2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "38z8Q0JCGYihBJIW",
+          "name": "Gmail account-brandondulian36@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "html",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        176
+      ],
+      "id": "0a33bb44-1556-40bc-ab0f-ae593732de7a",
+      "name": "crear_borrador",
+      "webhookId": "57c1d7f4-3aa9-468a-9f66-8a457844acc2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "38z8Q0JCGYihBJIW",
+          "name": "Gmail account-brandondulian36@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        176
+      ],
+      "id": "1cf03d48-abf0-4b34-9230-e73f462cfd63",
+      "name": "marcar_leido_correo",
+      "webhookId": "85003389-89db-46c8-8c17-7e3fe8f670bb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "38z8Q0JCGYihBJIW",
+          "name": "Gmail account-brandondulian36@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "762877ec-3783-435c-8758-73a274534044"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -96
+      ],
+      "id": "9640a5ef-68a5-41db-8fae-523148dfcd5a",
+      "name": "MCP Server Trigger",
+      "webhookId": "762877ec-3783-435c-8758-73a274534044"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "enviar_correo": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marcar_leido_correo": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear_borrador": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "67da4229-9d0f-40dd-8e6e-8591cfa2f3ea",
+  "meta": {
+    "instanceId": "edee4fdb0e6ddb09141983ae34a6a0bdc11efabbbd40bec9e217372c56e50596"
+  },
+  "id": "6faTQV6Q1Rv86l5I",
+  "tags": [
+    {
+      "updatedAt": "2025-12-02T20:44:26.307Z",
+      "createdAt": "2025-12-02T20:44:26.307Z",
+      "id": "LdOh15P4v73ZVRQp",
+      "name": "MCP"
+    },
+    {
+      "updatedAt": "2025-12-02T20:44:34.239Z",
+      "createdAt": "2025-12-02T20:44:34.239Z",
+      "id": "xzOuCwldQ9G58hnC",
+      "name": "Server"
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "name": "Tool-informacion pokemon",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"name\": \"pikachu\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "21f61c28-ddcf-4273-a841-ffe87fe9b836",
+      "name": "Inicio- datos de entrada de otro workfow"
+    },
+    {
+      "parameters": {
+        "url": "=https://pokeapi.co/api/v2/pokemon/{{ $json.name.trim().toLowerCase() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "de5c4ed1-4612-4298-9aec-87c3c49c2af6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfca6ac8-365c-461e-8479-021c910f8219",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "c1ce7972-6e2a-409e-a217-6fc244b14f65",
+              "name": "moves[0].move.name",
+              "value": "={{ $json.moves[0].move.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4b05071a-c341-4667-941f-4164a72ff643",
+              "name": "sprites.back_default",
+              "value": "={{ $json.sprites.back_default }}",
+              "type": "string"
+            },
+            {
+              "id": "02f5b370-59b2-4b53-a029-ad77e97469bc",
+              "name": "sprites.front_default",
+              "value": "={{ $json.sprites.front_default }}",
+              "type": "string"
+            },
+            {
+              "id": "3195a198-41af-4709-a585-e5d2fb9b481b",
+              "name": "weight",
+              "value": "={{ $json.weight }}",
+              "type": "number"
+            },
+            {
+              "id": "65147749-fde3-4339-9e45-7e676a423819",
+              "name": "types",
+              "value": "={{ $json.types.map(item => item.type).map(item => item.name) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "845bb70a-2378-493b-a3b9-3351f012d741",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {
+    "Inicio- datos de entrada de otro workfow": [
+      {
+        "json": {
+          "name": "Pikachu"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Inicio- datos de entrada de otro workfow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "47c2460b-007a-49e5-adb0-d124d94b888d",
+  "meta": {
+    "instanceId": "edee4fdb0e6ddb09141983ae34a6a0bdc11efabbbd40bec9e217372c56e50596"
+  },
+  "id": "jhElfOkehezdm2YZ",
+  "tags": []
+}
