@@ -55,7 +55,7 @@ E importa el flujo desde:
 
 bash
 Copiar código
-/workflows/AI_Agent_Principal.json
+/workflows/Agentes/Asistente Personal.json
 ✉️ Autor
 Brandon Suárez
 📧 brandondulian36@gmail.com
