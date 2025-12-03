@@ -14,7 +14,7 @@ Este flujo es el agente central que interpreta mensajes del usuario mediante un 
 ---
 
 ## 🧠 Repositorio del flujo
-![Flujo Asistente Personal](../workflows/AI_Agent_Principal.json)  
+![Flujo Asistente Personal](../workflows//Agentes//Asistente%20Personal.json)  
 
 ---
 
