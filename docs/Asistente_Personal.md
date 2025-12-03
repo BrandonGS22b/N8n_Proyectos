@@ -1,26 +1,29 @@
-# 🧩 Flujo Automatizado — Obtener Información Detallada de Pokémon (API)
+# 🧩 Flujo Automatizado — Agente de IA Personal con Herramientas MCP
 
-Este flujo es un **sub-workflow** encargado de consultar una API externa (PokeAPI) para obtener información detallada de un Pokémon, utilizando un ID o nombre enviado desde otro flujo superior.
+Este flujo es el agente central que interpreta mensajes del usuario mediante un modelo de IA (Google Gemini), mantiene contexto con MongoDB y ejecuta acciones usando herramientas externas como Gmail, Calendar y una API de Pokémon.
 
 ---
 
 ## 🧠 Flujo Visual
 
-![Flujo Pokemon API](./img/Asistente_Personal.png),
-![Flujo Pokemon API](./img/MCP_AsistentePersonal_Calendar.png),
-![Flujo Pokemon API](./img/MCP_AsistentePersonal_Gmail.png),
-![Flujo Pokemon API](./img/Tool_AsistentePersonal_Pokemon.png)
+![Flujo Asistente Personal](./img/Asistente_Personal.png)  
+![MCP Calendar](./img/MCP_AsistentePersonal_Calendar.png)  
+![MCP Gmail](./img/MCP_AsistentePersonal_Gmail.png)  
+![Tool Pokémon](./img/Tool_AsistentePersonal_Pokemon.png)
 
 ---
 
 ## 📘 Descripción General
 
-Este flujo se activa únicamente cuando otro workflow lo llama. Su función es tomar un ID de Pokémon, hacer la consulta externa y devolver los datos listos para ser usados.
+El agente se activa cuando llega un mensaje del usuario y decide qué acción realizar basándose en la intención detectada por IA.  
+Puede:
 
-1. **Recibe el ID del Pokémon** enviado desde el flujo principal.
-2. **Realiza una solicitud HTTP** a la API `PokeAPI`.
-3. **Estructura la información recibida**, dejando solo los campos necesarios.
-4. **Retorna la respuesta procesada** al workflow que lo invocó.
+1. Responder mensajes con IA.
+2. Consultar o enviar correos mediante Gmail.
+3. Crear o eliminar eventos de calendario.
+4. Obtener información de Pokémon usando un sub-workflow.
+
+El agente usa memoria en MongoDB para recordar el contexto de la conversación.
 
 ---
 
@@ -28,54 +31,35 @@ Este flujo se activa únicamente cuando otro workflow lo llama. Su función es t
 
 | Módulo | Tipo | Descripción |
 |--------|------|-------------|
-| **Execute Workflow Trigger** | Disparador | Permite que este sub-workflow sea ejecutado por otro flujo. |
-| **Entrada (ID del Pokémon)** | Datos | Recibe el parámetro que indica qué Pokémon consultar. |
-| **HTTP Request** | API Externa | Consulta la API `https://pokeapi.co/api/v2/pokemon/{id}`. |
-| **Edit Fields Manual** | Transformación | Limpia, transforma y selecciona los datos que se enviarán de vuelta. |
+| **When chat message received** | Disparador | Inicia el flujo ante un nuevo mensaje del usuario. |
+| **AI Agent** | Lógica Inteligente | Recibe el mensaje, consulta el modelo y decide qué herramienta usar. |
+| **Google Gemini Chat Model** | Modelo IA | Procesa el lenguaje natural y determina la intención. |
+| **MongoDB Chat Memory** | Memoria | Guarda contexto conversacional para respuestas más coherentes. |
+| **MCP_Gmail_Client** | Tool Client | Permite al agente enviar correos, crear borradores y obtener mensajes. |
+| **MCP Client-Calendar** | Tool Client | Permite al agente crear, eliminar y listar eventos del calendario. |
+| **Obtener información de pokemons** | Tool Interna | Llama al sub-workflow encargado de consultar la PokeAPI. |
+| **MCP SERVER de Gmail** | Servidor de herramientas | Expone funciones: enviar correo, crear borrador, obtener correos. |
+| **MCP SERVER de Calendar** | Servidor de herramientas | Expone funciones: crear, eliminar y obtener eventos. |
 
 ---
 
-## 🧾 Ejemplo de Configuración
+## 🚀 Ejecución con Docker
 
-**Entrada desde otro flujo:**
-```json
-{
-  "pokemonId": 25
-}
-Endpoint usado:
-
-bash
-Copiar código
-GET https://pokeapi.co/api/v2/pokemon/25
-Datos que se devuelven:
-
-ID
-
-Nombre
-
-Tipos
-
-Habilidades
-
-Sprite frontal
-
-🚀 Ejecución con Docker
-bash
-Copiar código
+```bash
 docker-compose up -d
-Accede al panel n8n en:
+Luego accede a:
 
 👉 http://localhost:5678
 
-Importa este flujo desde:
+E importa el flujo desde:
 
 bash
 Copiar código
-/workflows/Flujo_Informacion_Pokemon_v2.json
+/workflows/AI_Agent_Principal.json
 ✉️ Autor
-
 Brandon Suárez
 📧 brandondulian36@gmail.com
 🌐 github.com/BrandonGS22b
 
-
+yaml
+Copiar código
