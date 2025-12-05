@@ -17,7 +17,7 @@ El proyecto está diseñado para ser fácilmente desplegado mediante **Docker** 
 | 🤖 **Agente de IA con Herramientas MCP (Gmail, Calendar, Pokémon)** | Agente inteligente que utiliza Google Gemini, memoria en MongoDB y herramientas externas para ejecutar acciones como enviar correos, gestionar eventos de calendario y consultar información de Pokémon en tiempo real. | [Ver documentación](./docs/Asistente_Personal.md) |
 | 🛍️ **Agente Tienda Online** | Agente conversacional de soporte que utiliza Google Gemini, memoria en MongoDB y herramientas HTTP para consultar y modificar órdenes de una tienda online. | [Ver documentación](./docs/Agente_tienda_online.md) |
 | 💾 **Sistema RAG Documentos-Agente IA** | Implementación de un sistema RAG (Retrieval-Augmented Generation) para indexar documentos en una base de datos vectorial (Postgres) y permitir al Agente IA responder preguntas fundamentadas. | [Ver documentación](./docs/SIstema_rag_DocumentosIA.md) |
-| 🗣️ **Agente Voz E-commerce** | Agente de IA conversacional que consulta productos y órdenes de un backend (API) y genera respuestas de soporte en tiempo real mediante voz (Text-to-Speech). | n8n · Gemini · ElevenLabs · MongoDB · HTTP/API | [Ver documentación](./docs/elevenlabs-AgenteIAVoz.md) |
+| 🗣️ **Agente Voz E-commerce** | Agente de IA conversacional que consulta productos y órdenes de un backend (API) y genera respuestas de soporte en tiempo real mediante voz (Text-to-Speech). Gemini · ElevenLabs · MongoDB · HTTP/API. | [Ver documentación](./docs/elevenlabs-AgenteIAVoz.md) |
 
 ---
 
