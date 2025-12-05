@@ -8,7 +8,7 @@ Funciona como un asistente de voz avanzado para soporte de tienda online y consu
 
 ## 🧠 Flujo Visual
 
-![Diagrama del Agente de Voz para E-commerce, combinando el Agente IA con herramientas de gestión de órdenes y la generación de voz con ElevenLabs.io.](Agente_Voz_E-commerce.png)
+![Diagrama del Agente de Voz para E-commerce, combinando el Agente IA con herramientas de gestión de órdenes y la generación de voz con ElevenLabs.io.]((./img/SIstema_rag_DocumentosIA.png))
 
 ---
 
