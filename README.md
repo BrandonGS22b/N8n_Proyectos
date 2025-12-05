@@ -15,6 +15,7 @@ El proyecto está diseñado para ser fácilmente desplegado mediante **Docker** 
 | 🧩 **Extracción y Actualización Automática de Cursos (Scraping)** | Flujo que analiza sitios web, extrae cursos usando IA, actualiza información, genera documentos y temarios automáticamente. | [Ver documentación](./docs/Scraping-curso.md) |
 | 🌐 **Agente IA con Consulta a Wikipedia** | Agente inteligente que usa modelos de IA, memoria en MongoDB y acceso a herramientas externas como Wikipedia para obtener información real en tiempo real. | [Ver documentación](./docs/Wikipedia-Agente.md) |
 | 🤖 **Agente de IA con Herramientas MCP (Gmail, Calendar, Pokémon)** | Agente inteligente que utiliza Google Gemini, memoria en MongoDB y herramientas externas para ejecutar acciones como enviar correos, gestionar eventos de calendario y consultar información de Pokémon en tiempo real. | [Ver documentación](./docs/Asistente_Personal.md) |
+| 🛍️ **Agente Tienda Online** | Agente conversacional de soporte que utiliza Google Gemini, memoria en MongoDB y herramientas HTTP para consultar y modificar órdenes de una tienda online. | [Ver documentación](./docs/Agente_tienda_online.md) |
 
 
 ---
