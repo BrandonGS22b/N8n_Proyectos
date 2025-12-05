@@ -8,7 +8,7 @@ Funciona como un asistente personal conectado a tus contactos y servicios extern
 
 ## 🧠 Flujo Visual
 
-![Flujo Agente Telegram](./img/Wikipedia-Agente.png)
+![Flujo Agente Telegram](./img/elevenlabs-AgenteIAVoz.png)
 
 ---
 
